@@ -9,21 +9,21 @@ export class AuthController {
 
   @MessagePattern('auth.register.user')
   async registerUser() {
-    return 'User registered';
+    return { message: 'User registered' };
   }
 
   @MessagePattern('auth.login.user')
   async loginUser() {
-    return 'User logged in';
+    return { message: 'User logged in' };
   }
 
   @MessagePattern('auth.logout.user')
   async logoutUser() {
-    return 'User logged out';
+    return { message: 'User logged out' };
   }
 
   @MessagePattern('auth.verify.user')
   async verifyUser() {
-    return 'User verified';
+    return { message: 'User verified' };
   }
 }
