@@ -8,14 +8,14 @@ import { LoginUserDto, RegisterUserDto } from './dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @MessagePattern('auth.register.user')
-  async registerUser(@Payload() registerUser: RegisterUserDto) {
+  @MessagePattern('authRegister')
+  registerUser(@Payload() registerUser: RegisterUserDto) {
     return this.authService.registerUser(registerUser);
   }
 
   @MessagePattern('auth.login.user')
-  async loginUser(@Payload() loginUser: LoginUserDto) {
-    return { loginUser };
+  loginUser(@Payload() loginUser: LoginUserDto) {
+    return this.authService.loginUser(loginUser);
   }
 
   @MessagePattern('auth.logout.user')
