@@ -1,12 +1,18 @@
 import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { RpcException } from '@nestjs/microservices';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 import { LoginUserDto, RegisterUserDto } from './dto';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 @Injectable()
 export class AuthService extends PrismaClient implements OnModuleInit {
+  constructor(private readonly jwtService: JwtService) {
+    super();
+  }
+
   private readonly logger = new Logger('AuthService');
 
   onModuleInit() {
@@ -29,7 +35,10 @@ export class AuthService extends PrismaClient implements OnModuleInit {
         data: { email, name, password: hashedPassword },
       });
       delete newUser.password;
-      return { user: newUser, token: 'PDT' };
+      return {
+        user: newUser,
+        token: await this.signJwt(newUser),
+      };
     } catch (error) {
       throw new RpcException({
         statusCode: HttpStatus.BAD_REQUEST,
@@ -49,8 +58,8 @@ export class AuthService extends PrismaClient implements OnModuleInit {
       if (!isPasswordValid) {
         throw new RpcException('Invalid credentials');
       }
-      const token = 'PDT';
       delete user.password;
+      const token = await this.signJwt(user);
       return { user, token };
     } catch (error) {
       throw new RpcException({
@@ -58,5 +67,11 @@ export class AuthService extends PrismaClient implements OnModuleInit {
         message: error.message,
       });
     }
+  }
+
+  private async signJwt(user: User) {
+    const { id, email, name } = user;
+    const payload: JwtPayload = { id, email, name };
+    return this.jwtService.sign(payload);
   }
 }
