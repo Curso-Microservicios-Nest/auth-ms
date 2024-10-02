@@ -18,13 +18,8 @@ export class AuthController {
     return this.authService.loginUser(loginUser);
   }
 
-  @MessagePattern('auth.logout.user')
-  async logoutUser() {
-    return { message: 'User logged out' };
-  }
-
   @MessagePattern('auth.verify.user')
-  async verifyUser() {
-    return { message: 'User verified' };
+  async verifyUser(@Payload() token: string) {
+    return this.authService.verifyUser(token);
   }
 }
